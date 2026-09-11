@@ -1,0 +1,75 @@
+#include "scene/menu.h"
+
+#include "arduboy.h"
+#include "tools.h"
+
+namespace game::scene
+{
+
+namespace
+{
+
+auto print_arrow(const auto pos)
+{
+    auto& arduboy = game::core::get_arduboy();
+
+    arduboy.drawLine(pos.first, pos.second, pos.first + 4, pos.second + 4, WHITE);
+    arduboy.drawLine(pos.first + 4, pos.second + 4, pos.first, pos.second + 8, WHITE);
+    arduboy.drawLine(pos.first - 6, pos.second + 4, pos.first + 2, pos.second + 4, WHITE);
+}
+
+auto print_text(const auto pos, const auto text, const auto text_size, const auto is_highlight)
+{
+    auto& arduboy = game::core::get_arduboy();
+
+    if (is_highlight)
+        print_arrow(tools::pair{pos.first - 7, pos.second});
+
+    arduboy.setCursor(pos.first, pos.second);
+    arduboy.print(text);
+}
+
+} // unnamed namespace
+
+menu::menu(uint8_t text_size)
+{
+    game::core::get_arduboy().setTextSize(text_size);
+}
+
+void menu::draw()
+{
+    auto& arduboy = game::core::get_arduboy();
+    const auto text_size = arduboy.getTextSize();
+    const auto center = game::tools::pair{arduboy.width() / 2, arduboy.height() / 2};
+
+    auto pos = tools::pair{center.first - char_width * text_size * sizeof(start) / 2, center.second};
+    print_text(pos, start, text_size, current_highlight == game::core::mode::game);
+
+    pos = tools::pair{center.first - char_width * text_size * sizeof(scores) / 2, center.second + char_height + 2};
+    print_text(pos, scores, text_size, current_highlight == game::core::mode::scores);
+
+    process_key_press();
+}
+
+game::core::mode menu::get_scene()
+{
+    return current_scene;
+}
+
+void menu::process_key_press()
+{
+    auto& arduboy = game::core::get_arduboy();
+    arduboy.pollButtons();
+
+    if (arduboy.justPressed(UP_BUTTON) || arduboy.justPressed(DOWN_BUTTON))
+    {
+        arduboy.setCursor(0, 0);
+
+        if (current_highlight == game::core::mode::game)
+            current_highlight = game::core::mode::scores;
+        else
+            current_highlight = game::core::mode::game;
+    }
+}
+
+} // namespace game::scene
