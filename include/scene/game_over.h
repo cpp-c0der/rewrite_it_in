@@ -11,9 +11,8 @@ namespace game::scene
 class game_over final : public scene::base
 {
 public:
-    game_over(const uint32_t score);
     void draw();
-    void reset();
+    void set_score(const uint32_t score);
 
 private:
     void process_key_press();
@@ -22,7 +21,7 @@ private:
     static inline char text[] = "Game Over";
     static inline char score_text[] = "Scores: ";
 
-    const uint32_t score;
+    uint32_t score;
 };
 
 } // namespace game::scene

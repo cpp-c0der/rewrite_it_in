@@ -1,6 +1,8 @@
 #include "scene/gameplay.h"
 
 #include "core/arduboy.h"
+#include "core/mode.h"
+#include "core/state.h"
 #include "tools.h"
 
 namespace game::scene
@@ -150,8 +152,7 @@ void update_position(Object& obj, Objects&... objects)
 
 } // namespace
 
-gameplay::gameplay() : base(game::core::mode::game),
-                       hero(get_center_position(), {entity_width, entity_height}, hero_default_speed),
+gameplay::gameplay() : hero(get_center_position(), {entity_width, entity_height}, hero_default_speed),
                        project(get_random_position(), {entity_width, entity_height}),
                        adrenaline({}, {entity_width, entity_height}),
                        enemy(get_random_position(), {entity_width, entity_height}, enemy_default_speed)
@@ -163,19 +164,6 @@ gameplay::gameplay() : base(game::core::mode::game),
 
     while (enemy.is_intersect(hero) || enemy.is_intersect(project))
         enemy.set_position(get_random_position());
-}
-
-gameplay::gameplay(const uint32_t level_number, const uint32_t score) : gameplay()
-{
-    this->level_number = level_number;
-    this->hero_score = score;
-
-    enemy.set_speed(enemy_default_speed + level_number);
-
-    project_limit = project_limit_base + project_limit_factor * level_number;
-    project_remaining = project_limit;
-    time_limit = time_limit_base + time_limit_factor * level_number;
-    time_remaining = time_limit;
 }
 
 void gameplay::draw()
@@ -198,29 +186,35 @@ void gameplay::draw()
 
     ++frame_count;
 
+    if (!project_remaining)
+    {
+        to_next_level();
+        auto& state = game::core::get_state();
+        state.set_next_level(level_number);
+        state.set_current_scene(game::core::mode::level);
+        return;
+    }
+
     if (frame_count % game::core::fps == 0)
     {
         frame_count = 0;
         --time_remaining;
 
         if (time_remaining == 0)
-            current_scene = game::core::mode::end;
+        {
+            auto& state = game::core::get_state();
+            state.set_last_score(hero_score);
+            state.set_current_scene(game::core::mode::end);
+            reset();
+        }
     }
 }
 
 void gameplay::reset()
 {
-    current_scene = game::core::mode::game;
-}
-
-uint32_t gameplay::get_score() const
-{
-    return hero_score;
-}
-
-uint32_t gameplay::get_level() const
-{
-    return level_number;
+    level_number = 0;
+    hero_score = 0;
+    reset_objects();
 }
 
 void gameplay::draw_sprites() const
@@ -268,7 +262,7 @@ void gameplay::process_key_press()
     else if (arduboy.justPressed(A_BUTTON))
         hero.switch_acceleration();
     else if (arduboy.justPressed(B_BUTTON))
-        current_scene = game::core::mode::menu;
+        game::core::get_state().set_current_scene(game::core::mode::menu);
 }
 
 void gameplay::process_project()
@@ -280,12 +274,6 @@ void gameplay::process_project()
         beep1.tone(beep1.freq(1000), game::tools::seconds_to_frame_count(1));
         project.hide();
         --project_remaining;
-
-        if (!project_remaining)
-        {
-            current_scene = game::core::mode::level;
-            return;
-        }
     }
 
     if (project.is_hide())
@@ -300,6 +288,7 @@ void gameplay::process_adrenaline()
     if (hero.is_intersect(adrenaline))
     {
         hero.add_energy(10);
+        hero_score += 1;
         auto& beep1 = game::core::get_beep_pin1();
         beep1.tone(beep1.freq(1000), game::tools::seconds_to_frame_count(1));
         adrenaline.hide();
@@ -333,6 +322,29 @@ void gameplay::process_enemy()
         enemy.set_direction(entity::direction::down);
     else if (project_pos.y + project_size.second <= enemy_pos.y)
         enemy.set_direction(entity::direction::up);
+}
+
+void gameplay::to_next_level()
+{
+    ++level_number;
+    reset_objects();
+}
+
+void gameplay::reset_objects()
+{
+    enemy.set_speed(enemy_default_speed + level_number);
+
+    project_limit = project_limit_base + project_limit_factor * level_number;
+    project_remaining = project_limit;
+    time_limit = time_limit_base + time_limit_factor * level_number;
+    time_remaining = time_limit;
+    frame_count = 0;
+
+    adrenaline.hide();
+    hero.set_position(get_center_position());
+
+    update_position(project, hero);
+    update_position(enemy, hero, project);
 }
 
 } // namespace game::scene

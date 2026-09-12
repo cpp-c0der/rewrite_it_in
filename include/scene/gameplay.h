@@ -13,20 +13,18 @@ class gameplay : public scene::base
 {
 public:
     gameplay();
-    gameplay(const uint32_t level_number, const uint32_t score);
     void draw();
-    void reset();
-    uint32_t get_score() const;
-    uint32_t get_level() const;
 
 private:
+    void reset();
+    void to_next_level();
     void draw_sprites() const;
     void draw_status() const;
     void process_key_press();
     void process_project();
     void process_adrenaline();
     void process_enemy();
-    void next_level();
+    void reset_objects();
 
 private:
     static inline constexpr auto border_width = uint8_t(2);
@@ -43,10 +41,13 @@ private:
 
     uint32_t hero_score = 0;
     uint32_t level_number = 0;
-    uint32_t time_limit = project_limit_base;
+
     uint32_t project_limit = project_limit_base;
-    uint32_t time_remaining = time_limit;
     uint32_t project_remaining = project_limit;
+
+    uint32_t time_limit = time_limit_base;
+    uint32_t time_remaining = time_limit;
+
     uint8_t frame_count = 0;
 
     entity::accelerable_object hero;

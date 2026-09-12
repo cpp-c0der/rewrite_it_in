@@ -1,14 +1,11 @@
 #include "scene/level.h"
 
 #include "core/arduboy.h"
+#include "core/state.h"
 #include "tools.h"
 
 namespace game::scene
 {
-
-level::level(const uint32_t level_number) : scene::base(game::core::mode::level), level_number(level_number)
-{
-}
 
 void level::draw()
 {
@@ -26,13 +23,18 @@ void level::draw()
     process_key_press();
 }
 
+void level::set_level(const uint32_t level_number)
+{
+    this->level_number = level_number;
+}
+
 void level::process_key_press()
 {
     auto& arduboy = game::core::get_arduboy();
     arduboy.pollButtons();
 
-    if (arduboy.justPressed(A_BUTTON) || arduboy.justPressed(B_BUTTON))
-        current_scene = game::core::mode::game;
+    if (arduboy.justPressed(UP_BUTTON) || arduboy.justPressed(DOWN_BUTTON) || arduboy.justPressed(LEFT_BUTTON) || arduboy.justPressed(RIGHT_BUTTON) || arduboy.justPressed(A_BUTTON) || arduboy.justPressed(B_BUTTON))
+        game::core::get_state().set_current_scene(game::core::mode::game);
 }
 
 } // namespace game::scene

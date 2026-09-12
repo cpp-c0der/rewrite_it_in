@@ -1,6 +1,7 @@
 #ifndef MENU_H
 #define MENU_H
 
+#include "core/mode.h"
 #include "scene/base.h"
 
 namespace game::scene
@@ -20,7 +21,7 @@ private:
     static inline constexpr char start[] = "start";
     static inline constexpr char scores[] = "scores";
 
-    game::core::mode current_highlight = core::mode::game;
+    game::core::mode current_highlight = core::mode::level;
 };
 
 } // namespace game::scene

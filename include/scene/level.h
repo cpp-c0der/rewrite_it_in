@@ -9,14 +9,15 @@ namespace game::scene
 class level final : public game::scene::base
 {
 public:
-    level(const uint32_t level_number);
     void draw();
+    void set_level(const uint32_t level_number);
 
 private:
     void process_key_press();
 
 private:
     static inline constexpr char text[] = "Level: ";
+    static inline constexpr char text_with_keys[] = "Press any key";
 
     uint32_t level_number;
 };

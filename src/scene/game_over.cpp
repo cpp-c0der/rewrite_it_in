@@ -1,14 +1,11 @@
 #include "scene/game_over.h"
 
 #include "core/arduboy.h"
+#include "core/state.h"
 #include "tools.h"
 
 namespace game::scene
 {
-
-game_over::game_over(uint32_t score) : base(game::core::mode::end), score(score)
-{
-}
 
 void game_over::draw()
 {
@@ -34,7 +31,12 @@ void game_over::process_key_press()
     arduboy.pollButtons();
 
     if (arduboy.justPressed(A_BUTTON))
-        current_scene = game::core::mode::menu;
+        game::core::get_state().set_current_scene(game::core::mode::menu);
+}
+
+void game_over::set_score(const uint32_t score)
+{
+    this->score = score;
 }
 
 }; // namespace game::scene

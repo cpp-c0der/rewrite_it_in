@@ -28,16 +28,12 @@ void loop()
     {
         auto& menu = state.get_menu();
         menu.draw();
-        state.set_current_scene(menu.get_scene());
-        menu.reset();
         break;
     }
     case game::core::mode::game:
     {
         auto& gameplay = state.get_gameplay();
         gameplay.draw();
-        state.set_current_scene(gameplay.get_scene());
-        gameplay.reset();
         break;
     }
     case game::core::mode::scores:
@@ -47,18 +43,17 @@ void loop()
     }
     case game::core::mode::level:
     {
-        auto level = game::scene::level(state.get_gameplay().get_level());
+        auto& level = state.get_level();
+        level.set_level(state.get_next_level());
         level.draw();
-        state.set_current_scene(level.get_scene());
+
         break;
     }
     case game::core::mode::end:
     {
-        auto& gameplay = state.get_gameplay();
-        auto game_over = game::scene::game_over(gameplay.get_score());
-        gameplay = game::scene::gameplay();
+        auto& game_over = state.get_game_over();
+        game_over.set_score(state.get_last_score());
         game_over.draw();
-        state.set_current_scene(game_over.get_scene());
         break;
     }
     }
