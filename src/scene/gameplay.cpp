@@ -131,54 +131,62 @@ auto get_random_position()
     return game::geometry::point{x, y};
 }
 
+template <typename Object, typename... Objects>
+void update_position(Object& obj, Objects&... objects)
+{
+    obj.set_position(get_random_position());
+
+    while ((obj.is_intersect(objects) || ...))
+        obj.set_position(get_random_position());
+}
+
 } // namespace
 
-gameplay::gameplay() : hero(get_center_position(), {entity_width, entity_height}, default_speed),
+gameplay::gameplay() : hero(get_center_position(), {entity_width, entity_height}, hero_default_speed),
                        project(get_random_position(), {entity_width, entity_height}),
-                       adrenaline({}, {entity_width, entity_height})
+                       adrenaline({}, {entity_width, entity_height}),
+                       enemy({}, {entity_width, entity_height}, enemy_default_speed)
 {
     adrenaline.hide();
 
     while (hero.is_intersect(project))
         project.set_position(get_random_position());
+
+    while (enemy.is_intersect(hero) || enemy.is_intersect(project))
+        enemy.set_position(get_random_position());
 }
 
 void gameplay::draw()
 {
     auto& arduboy = game::core::get_arduboy();
-    const auto hero_pos = hero.get_position();
-    const auto project_pos = project.get_position();
-    const auto adrenaline_pos = project.get_position();
-
-    Sprites::drawOverwrite(hero_pos.x, hero_pos.y, c_icon, static_cast<uint8_t>(hero.get_direction()));
-    Sprites::drawOverwrite(project_pos.x, project_pos.y, project_icon, 0);
-    if (!adrenaline.is_hide())
-        Sprites::drawOverwrite(adrenaline_pos.x, adrenaline_pos.y, adrenaline_icon, 0);
-
+    draw_sprites();
     process_key_press();
-
-    if (hero.is_intersect(project))
-        hero_scores += scores_for_project;
-
-    if (hero.is_intersect(adrenaline))
-        hero.add_energy(10);
-
-    while (hero.is_intersect(project))
-    {
-    }
-
-    if (adrenaline.is_hide() && adrenaline_propability > random(100))
-    {
-        while (adrenaline.is_intersect(hero) || adrenaline.is_intersect(project))
-            adrenaline.set_position(get_random_position());
-
-        adrenaline.show();
-    }
+    process_project();
+    process_adrenaline();
+    process_enemy();
 
     static const game::geometry::rectangle border{{0, 0}, {arduboy.width(), arduboy.height()}};
 
-    if (arduboy.everyXFrames(frame_interval))
+    if (arduboy.everyXFrames(hero_frame_interval))
         hero.move(border);
+
+    if (arduboy.everyXFrames(enemy_frame_interval))
+        enemy.move(border);
+}
+
+void gameplay::draw_sprites() const
+{
+    const auto hero_pos = hero.get_position();
+    const auto project_pos = project.get_position();
+    const auto adrenaline_pos = adrenaline.get_position();
+    const auto enemy_pos = enemy.get_position();
+
+    Sprites::drawOverwrite(hero_pos.x, hero_pos.y, c_icon, static_cast<uint8_t>(hero.get_direction()));
+    Sprites::drawOverwrite(enemy_pos.x, enemy_pos.y, rust_icon, static_cast<uint8_t>(enemy.get_direction()));
+    Sprites::drawOverwrite(project_pos.x, project_pos.y, project_icon, 0);
+
+    if (!adrenaline.is_hide())
+        Sprites::drawOverwrite(adrenaline_pos.x, adrenaline_pos.y, adrenaline_icon, 0);
 }
 
 void gameplay::process_key_press()
@@ -194,6 +202,45 @@ void gameplay::process_key_press()
         hero.set_direction(entity::direction::left);
     else if (arduboy.justPressed(RIGHT_BUTTON))
         hero.set_direction(entity::direction::right);
+}
+
+void gameplay::process_project()
+{
+    if (hero.is_intersect(project))
+    {
+        hero_scores += scores_for_project;
+        project.hide();
+    }
+
+    if (project.is_hide())
+    {
+        update_position(project, hero, adrenaline, enemy);
+        project.show();
+    }
+}
+
+void gameplay::process_adrenaline()
+{
+    if (hero.is_intersect(adrenaline))
+    {
+        hero.add_energy(10);
+        adrenaline.hide();
+    }
+
+    if (adrenaline.is_hide() && adrenaline_propability > random(100))
+    {
+        update_position(adrenaline, hero, project, enemy);
+        adrenaline.show();
+    }
+}
+
+void gameplay::process_enemy()
+{
+    if (enemy.is_intersect(adrenaline))
+        adrenaline.hide();
+
+    if (enemy.is_intersect(project))
+        project.hide();
 }
 
 } // namespace game::scene

@@ -24,6 +24,9 @@ object::size object::get_hitbox() const
 
 bool object::is_intersect(const object& obj) const
 {
+    if (obj.is_hide() || &obj == this)
+        return false;
+
     if (position.x + hitbox.first <= obj.position.x)
         return false;
     if (obj.position.x + obj.hitbox.first <= position.x)
