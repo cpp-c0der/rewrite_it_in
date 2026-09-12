@@ -63,7 +63,7 @@ void menu::process_key_press()
         if (current_highlight == game::core::mode::game)
             current_highlight = game::core::mode::scores;
         else
-            current_highlight = game::core::mode::game;
+            current_highlight = game::core::mode::level;
     }
     else if (arduboy.justPressed(A_BUTTON))
         current_scene = current_highlight;

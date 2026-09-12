@@ -18,4 +18,20 @@ pair<uint8_t, uint8_t> get_center()
     return pair{x, y};
 }
 
+uint8_t get_number_count(uint32_t num)
+{
+    uint8_t count = 0;
+
+    if (!num)
+        return 1;
+
+    while (num)
+    {
+        ++count;
+        num /= 10;
+    }
+
+    return count;
+}
+
 } // namespace game::tools

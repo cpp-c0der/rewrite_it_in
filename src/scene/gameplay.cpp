@@ -165,6 +165,19 @@ gameplay::gameplay() : base(game::core::mode::game),
         enemy.set_position(get_random_position());
 }
 
+gameplay::gameplay(const uint32_t level_number, const uint32_t score) : gameplay()
+{
+    this->level_number = level_number;
+    this->hero_score = score;
+
+    enemy.set_speed(enemy_default_speed + level_number);
+
+    project_limit = project_limit_base + project_limit_factor * level_number;
+    project_remaining = project_limit;
+    time_limit = time_limit_base + time_limit_factor * level_number;
+    time_remaining = time_limit;
+}
+
 void gameplay::draw()
 {
     draw_sprites();
@@ -182,11 +195,32 @@ void gameplay::draw()
 
     if (arduboy.everyXFrames(enemy_frame_interval))
         enemy.move(border);
+
+    ++frame_count;
+
+    if (frame_count % game::core::fps == 0)
+    {
+        frame_count = 0;
+        --time_remaining;
+
+        if (time_remaining == 0)
+            current_scene = game::core::mode::end;
+    }
 }
 
 void gameplay::reset()
 {
     current_scene = game::core::mode::game;
+}
+
+uint32_t gameplay::get_score() const
+{
+    return hero_score;
+}
+
+uint32_t gameplay::get_level() const
+{
+    return level_number;
 }
 
 void gameplay::draw_sprites() const
@@ -208,10 +242,14 @@ void gameplay::draw_status() const
 {
     auto& arduboy = game::core::get_arduboy();
     arduboy.setCursor(0, 0);
-    arduboy.print(F("S: "));
+    arduboy.print(F("S:"));
     arduboy.print(hero_score);
-    arduboy.print(F("; E: "));
+    arduboy.print(F(";E:"));
     arduboy.print(hero.get_energy());
+    arduboy.print(F(";T:"));
+    arduboy.print(time_remaining);
+    arduboy.print(F(";P:"));
+    arduboy.print(project_remaining);
 }
 
 void gameplay::process_key_press()
@@ -241,12 +279,19 @@ void gameplay::process_project()
         auto& beep1 = game::core::get_beep_pin1();
         beep1.tone(beep1.freq(1000), game::tools::seconds_to_frame_count(1));
         project.hide();
+        --project_remaining;
+
+        if (!project_remaining)
+        {
+            current_scene = game::core::mode::level;
+            return;
+        }
     }
 
     if (project.is_hide())
     {
-        update_position(project, hero, adrenaline, enemy);
         project.show();
+        update_position(project, hero, adrenaline, enemy);
     }
 }
 
@@ -262,8 +307,8 @@ void gameplay::process_adrenaline()
 
     if (adrenaline.is_hide() && adrenaline_propability > random(100))
     {
-        update_position(adrenaline, hero, project, enemy);
         adrenaline.show();
+        update_position(adrenaline, hero, project, enemy);
     }
 }
 

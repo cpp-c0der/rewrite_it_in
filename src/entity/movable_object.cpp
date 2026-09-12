@@ -17,6 +17,11 @@ uint8_t movable_object::get_speed() const
     return speed;
 }
 
+void movable_object::set_speed(uint8_t speed)
+{
+    this->speed = speed;
+}
+
 direction movable_object::get_direction() const
 {
     return current_direction;

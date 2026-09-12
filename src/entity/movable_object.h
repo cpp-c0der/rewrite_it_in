@@ -25,6 +25,7 @@ public:
 
     void move(const geometry::rectangle border);
     uint8_t get_speed() const;
+    void set_speed(uint8_t speed);
     direction get_direction() const;
     void set_direction(direction dir);
 

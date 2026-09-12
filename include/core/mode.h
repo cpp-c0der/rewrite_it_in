@@ -10,7 +10,9 @@ enum class mode : uint8_t
 {
     menu,
     game,
-    scores
+    scores,
+    level,
+    end
 };
 
 } // namespace game::core

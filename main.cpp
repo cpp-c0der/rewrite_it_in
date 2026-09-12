@@ -1,5 +1,7 @@
 #include "core/arduboy.h"
 #include "core/state.h"
+#include "scene/game_over.h"
+#include "scene/level.h"
 
 void setup()
 {
@@ -39,7 +41,26 @@ void loop()
         break;
     }
     case game::core::mode::scores:
+    {
+        state.set_current_scene(game::core::mode::menu);
         break;
+    }
+    case game::core::mode::level:
+    {
+        auto level = game::scene::level(state.get_gameplay().get_level());
+        level.draw();
+        state.set_current_scene(level.get_scene());
+        break;
+    }
+    case game::core::mode::end:
+    {
+        auto& gameplay = state.get_gameplay();
+        auto game_over = game::scene::game_over(gameplay.get_score());
+        gameplay = game::scene::gameplay();
+        game_over.draw();
+        state.set_current_scene(game_over.get_scene());
+        break;
+    }
     }
 
     arduboy.display();
