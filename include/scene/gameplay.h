@@ -19,9 +19,10 @@ private:
 
 private:
     static inline constexpr auto border_width = uint8_t(2);
-    static inline constexpr auto default_speed = uint8_t(4);
+    static inline constexpr auto default_speed = uint8_t(1);
 
     entity::accelerable_object hero;
+    entity::object project;
 };
 
 } // namespace game::scene

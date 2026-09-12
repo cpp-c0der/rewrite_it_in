@@ -6,12 +6,12 @@
 namespace game::entity
 {
 
-class accelerable_object : movable_object
+class accelerable_object : public movable_object
 {
 public:
     using movable_object::movable_object;
 
-    void move(direction dir);
+    void move(const game::geometry::rectangle border);
     uint8_t get_speed() const;
     uint8_t get_energy() const;
     void increase_energy(uint8_t value);

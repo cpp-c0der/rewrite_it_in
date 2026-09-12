@@ -3,24 +3,9 @@
 namespace game::entity
 {
 
-void accelerable_object::move(direction dir)
+void accelerable_object::move(const game::geometry::rectangle border)
 {
-
-    switch (dir)
-    {
-    case direction::up:
-        position.second -= get_speed();
-        break;
-    case direction::down:
-        position.second += get_speed();
-        break;
-    case direction::left:
-        position.first -= get_speed();
-        break;
-    case direction::right:
-        position.first += get_speed();
-        break;
-    }
+    movable_object::move(border, get_speed());
 
     if (acceleration_enabled && energy)
         energy -= 1;

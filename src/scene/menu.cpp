@@ -31,10 +31,10 @@ auto print_text(const auto pos, const auto text, const auto text_size, const aut
 
 } // unnamed namespace
 
-menu::menu(uint8_t text_size)
-{
-    game::core::get_arduboy().setTextSize(text_size);
-}
+// menu::menu(uint8_t text_size)
+// {
+//     game::core::get_arduboy().setTextSize(text_size);
+// }
 
 void menu::draw()
 {

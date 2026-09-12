@@ -1,5 +1,5 @@
 #include "core/arduboy.h"
-#include "scene/menu.h"
+#include "core/state.h"
 
 void setup()
 {
@@ -12,10 +12,30 @@ void loop()
     if (!(arduboy.nextFrame()))
         return;
 
-    auto& menu = game::core::get_menu();
-
     arduboy.clear();
-    menu.draw();
+
+    auto& state = game::core::get_state();
+    const auto scene = state.get_current_scene();
+
+    switch (scene)
+    {
+    case game::core::mode::menu:
+    {
+        auto& menu = state.get_menu();
+        menu.draw();
+        state.set_current_scene(menu.get_scene());
+        break;
+    }
+    case game::core::mode::game:
+    {
+        auto& gameplay = state.get_gameplay();
+        gameplay.draw();
+        break;
+    }
+    case game::core::mode::scores:
+        break;
+    }
+
     arduboy.display();
 
     // static constexpr auto width = 8;

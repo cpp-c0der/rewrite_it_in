@@ -3,6 +3,8 @@
 
 #include "object.h"
 
+#include "geometry.h"
+
 #include <stdint.h>
 
 namespace game::entity
@@ -19,13 +21,19 @@ enum class direction : uint8_t
 class movable_object : public object
 {
 public:
-    movable_object(point position, uint8_t speed);
+    movable_object(game::geometry::point position, size hitbox, uint8_t speed);
 
-    void move(direction dir);
+    void move(const geometry::rectangle border);
     uint8_t get_speed() const;
+    direction get_direction() const;
+    void set_direction(direction dir);
+
+protected:
+    void move(const geometry::rectangle border, const uint8_t current_speed);
 
 protected:
     uint8_t speed;
+    direction current_direction = direction::right;
 };
 
 } // namespace game::entity

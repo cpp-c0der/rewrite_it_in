@@ -24,20 +24,6 @@ BeepPin2& get_beep_pin2()
     return beep_pin;
 }
 
-scene::menu& get_menu()
-{
-    static scene::menu menu(1);
-
-    return menu;
-}
-
-scene::gameplay& get_gameplay()
-{
-    static scene::gameplay gameplay;
-
-    return gameplay;
-}
-
 void init()
 {
     get_arduboy().begin();
@@ -45,6 +31,7 @@ void init()
     get_beep_pin2().begin();
 
     get_arduboy().setFrameRate(fps);
+    get_arduboy().initRandomSeed();
 }
 
 } // namespace game::core
