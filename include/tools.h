@@ -15,6 +15,8 @@ struct pair
 
 uint32_t seconds_to_frame_count(uint32_t seconds);
 
+pair<uint8_t, uint8_t> get_center();
+
 } // namespace game::tools
 
 #endif

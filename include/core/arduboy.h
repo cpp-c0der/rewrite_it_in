@@ -1,6 +1,7 @@
 #ifndef ARDUBOY_H
 #define ARDUBOY_H
 
+#include "scene/gameplay.h"
 #include "scene/menu.h"
 
 #include <Arduboy2.h>
@@ -14,6 +15,7 @@ Arduboy2& get_arduboy();
 BeepPin1& get_beep_pin1();
 BeepPin2& get_beep_pin2();
 scene::menu& get_menu();
+scene::gameplay& get_gameplay();
 
 void init();
 

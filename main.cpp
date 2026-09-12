@@ -1,6 +1,5 @@
-#include "arduboy.h"
+#include "core/arduboy.h"
 #include "scene/menu.h"
-#include "tools.h"
 
 void setup()
 {

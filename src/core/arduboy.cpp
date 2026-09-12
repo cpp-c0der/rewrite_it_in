@@ -1,4 +1,4 @@
-#include "arduboy.h"
+#include "core/arduboy.h"
 
 namespace game::core
 {
@@ -29,6 +29,13 @@ scene::menu& get_menu()
     static scene::menu menu(1);
 
     return menu;
+}
+
+scene::gameplay& get_gameplay()
+{
+    static scene::gameplay gameplay;
+
+    return gameplay;
 }
 
 void init()

@@ -1,7 +1,7 @@
 #ifndef MENU_H
 #define MENU_H
 
-#include "mode.h"
+#include "core/mode.h"
 
 #include <stdint.h>
 
@@ -13,7 +13,7 @@ class menu
 public:
     menu(uint8_t text_size);
     void draw();
-    game::core::mode get_scene();
+    game::core::mode get_scene() const;
 
 private:
     void process_key_press();

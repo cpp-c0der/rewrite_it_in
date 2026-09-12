@@ -160,7 +160,9 @@ target_link_options(${PROJECT_NAME} PRIVATE
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
 
 find_program(AVR_OBJCOPY avr-objcopy REQUIRED)
 find_program(AVR_SIZE avr-size REQUIRED)
