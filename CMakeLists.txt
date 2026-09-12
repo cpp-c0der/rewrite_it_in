@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(arduboy_game
+project(rewrite_it_in
     LANGUAGES C CXX
 )
 

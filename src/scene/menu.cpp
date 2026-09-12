@@ -3,6 +3,8 @@
 #include "core/arduboy.h"
 #include "tools.h"
 
+#include <stdint.h>
+
 namespace game::scene
 {
 
@@ -31,10 +33,10 @@ auto print_text(const auto pos, const auto text, const auto text_size, const aut
 
 } // unnamed namespace
 
-// menu::menu(uint8_t text_size)
-// {
-//     game::core::get_arduboy().setTextSize(text_size);
-// }
+menu::menu() : scene::base(game::core::mode::menu)
+{
+    game::core::get_arduboy().setTextSize(text_size);
+}
 
 void menu::draw()
 {
@@ -51,11 +53,6 @@ void menu::draw()
     process_key_press();
 }
 
-game::core::mode menu::get_scene() const
-{
-    return current_scene;
-}
-
 void menu::process_key_press()
 {
     auto& arduboy = game::core::get_arduboy();
@@ -70,6 +67,11 @@ void menu::process_key_press()
     }
     else if (arduboy.justPressed(A_BUTTON))
         current_scene = current_highlight;
+}
+
+void menu::reset()
+{
+    current_scene = game::core::mode::menu;
 }
 
 } // namespace game::scene

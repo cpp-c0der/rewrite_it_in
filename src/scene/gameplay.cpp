@@ -113,6 +113,14 @@ constexpr uint8_t adrenaline_icon[] PROGMEM =
         0x7C, 0xEE, 0xBB, 0xAB, 0xBB, 0xAB, 0xFE, 0x7C //
 };
 
+auto get_border(const auto offset)
+{
+    auto& arduboy = game::core::get_arduboy();
+    static const game::geometry::rectangle border{{offset.x, offset.y}, {arduboy.width(), arduboy.height()}};
+
+    return border;
+}
+
 auto get_center_position()
 {
     const auto center = tools::get_center();
@@ -124,9 +132,9 @@ auto get_center_position()
 
 auto get_random_position()
 {
-    auto& arduboy = game::core::get_arduboy();
-    const auto x = static_cast<uint8_t>(random(0, arduboy.width() - entity_width));
-    const auto y = static_cast<uint8_t>(random(0, arduboy.height() - entity_height));
+    static const auto border = get_border(geometry::point{0, scene::base::char_height});
+    const auto x = static_cast<uint8_t>(random(border.left_up.x, border.right_down.x - entity_width));
+    const auto y = static_cast<uint8_t>(random(border.left_up.y, border.right_down.y - entity_height));
 
     return game::geometry::point{x, y};
 }
@@ -142,10 +150,11 @@ void update_position(Object& obj, Objects&... objects)
 
 } // namespace
 
-gameplay::gameplay() : hero(get_center_position(), {entity_width, entity_height}, hero_default_speed),
+gameplay::gameplay() : base(game::core::mode::game),
+                       hero(get_center_position(), {entity_width, entity_height}, hero_default_speed),
                        project(get_random_position(), {entity_width, entity_height}),
                        adrenaline({}, {entity_width, entity_height}),
-                       enemy({}, {entity_width, entity_height}, enemy_default_speed)
+                       enemy(get_random_position(), {entity_width, entity_height}, enemy_default_speed)
 {
     adrenaline.hide();
 
@@ -158,20 +167,26 @@ gameplay::gameplay() : hero(get_center_position(), {entity_width, entity_height}
 
 void gameplay::draw()
 {
-    auto& arduboy = game::core::get_arduboy();
     draw_sprites();
+    draw_status();
     process_key_press();
     process_project();
     process_adrenaline();
     process_enemy();
 
-    static const game::geometry::rectangle border{{0, 0}, {arduboy.width(), arduboy.height()}};
+    auto& arduboy = game::core::get_arduboy();
+    static const auto border = get_border(game::geometry::point{0, char_height});
 
     if (arduboy.everyXFrames(hero_frame_interval))
         hero.move(border);
 
     if (arduboy.everyXFrames(enemy_frame_interval))
         enemy.move(border);
+}
+
+void gameplay::reset()
+{
+    current_scene = game::core::mode::game;
 }
 
 void gameplay::draw_sprites() const
@@ -189,6 +204,16 @@ void gameplay::draw_sprites() const
         Sprites::drawOverwrite(adrenaline_pos.x, adrenaline_pos.y, adrenaline_icon, 0);
 }
 
+void gameplay::draw_status() const
+{
+    auto& arduboy = game::core::get_arduboy();
+    arduboy.setCursor(0, 0);
+    arduboy.print(F("S: "));
+    arduboy.print(hero_score);
+    arduboy.print(F("; E: "));
+    arduboy.print(hero.get_energy());
+}
+
 void gameplay::process_key_press()
 {
     auto& arduboy = game::core::get_arduboy();
@@ -204,13 +229,17 @@ void gameplay::process_key_press()
         hero.set_direction(entity::direction::right);
     else if (arduboy.justPressed(A_BUTTON))
         hero.switch_acceleration();
+    else if (arduboy.justPressed(B_BUTTON))
+        current_scene = game::core::mode::menu;
 }
 
 void gameplay::process_project()
 {
     if (hero.is_intersect(project))
     {
-        hero_scores += scores_for_project;
+        hero_score += scores_for_project;
+        auto& beep1 = game::core::get_beep_pin1();
+        beep1.tone(beep1.freq(1000), game::tools::seconds_to_frame_count(1));
         project.hide();
     }
 
@@ -226,6 +255,8 @@ void gameplay::process_adrenaline()
     if (hero.is_intersect(adrenaline))
     {
         hero.add_energy(10);
+        auto& beep1 = game::core::get_beep_pin1();
+        beep1.tone(beep1.freq(1000), game::tools::seconds_to_frame_count(1));
         adrenaline.hide();
     }
 

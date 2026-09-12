@@ -2,20 +2,23 @@
 #define GAMEPLAY_H
 
 #include "entity/accelerable_object.h"
+#include "scene/base.h"
 
 #include <stdint.h>
 
 namespace game::scene
 {
 
-class gameplay
+class gameplay : public scene::base
 {
 public:
     gameplay();
     void draw();
+    void reset();
 
 private:
     void draw_sprites() const;
+    void draw_status() const;
     void process_key_press();
     void process_project();
     void process_adrenaline();
@@ -35,7 +38,7 @@ private:
     entity::object project;
     entity::object adrenaline;
 
-    uint64_t hero_scores = 0;
+    uint32_t hero_score = 0;
 };
 
 } // namespace game::scene

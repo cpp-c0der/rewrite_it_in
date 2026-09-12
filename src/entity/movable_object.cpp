@@ -32,7 +32,7 @@ void movable_object::move(const geometry::rectangle border, const uint8_t curren
     switch (current_direction)
     {
     case direction::up:
-        if (position.y > current_speed)
+        if (position.y > current_speed + border.left_up.y)
             position.y -= current_speed;
         else
             position.y = border.left_up.y;
@@ -44,7 +44,7 @@ void movable_object::move(const geometry::rectangle border, const uint8_t curren
             position.y = border.right_down.y - hitbox.second;
         break;
     case direction::left:
-        if (position.x > current_speed)
+        if (position.x > current_speed + border.left_up.x)
             position.x -= current_speed;
         else
             position.x = border.left_up.x;
