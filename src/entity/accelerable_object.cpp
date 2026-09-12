@@ -24,9 +24,12 @@ uint8_t accelerable_object::get_energy() const
     return energy;
 }
 
-void accelerable_object::increase_energy(uint8_t value)
+void accelerable_object::add_energy(uint8_t value)
 {
     energy += value;
+
+    if (energy > energy_limit)
+        energy = energy_limit;
 }
 
 void accelerable_object::enable_acceleration()

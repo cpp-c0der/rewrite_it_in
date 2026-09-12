@@ -36,4 +36,19 @@ bool object::is_intersect(const object& obj) const
     return true;
 }
 
+void object::hide()
+{
+    is_visible = false;
+}
+
+void object::show()
+{
+    is_visible = true;
+}
+
+bool object::is_hide() const
+{
+    return !is_visible;
+}
+
 } // namespace game::entity

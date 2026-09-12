@@ -12,10 +12,10 @@ namespace game::entity
 
 enum class direction : uint8_t
 {
-    up,
-    down,
+    right,
     left,
-    right
+    up,
+    down
 };
 
 class movable_object : public object

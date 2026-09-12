@@ -20,10 +20,14 @@ public:
     void set_position(const game::geometry::point position);
     size get_hitbox() const;
     bool is_intersect(const object& obj) const;
+    void hide();
+    void show();
+    bool is_hide() const;
 
 protected:
     geometry::point position;
     size hitbox;
+    bool is_visible = true;
 };
 
 } // namespace game::entity
