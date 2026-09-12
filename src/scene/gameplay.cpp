@@ -202,6 +202,8 @@ void gameplay::process_key_press()
         hero.set_direction(entity::direction::left);
     else if (arduboy.justPressed(RIGHT_BUTTON))
         hero.set_direction(entity::direction::right);
+    else if (arduboy.justPressed(A_BUTTON))
+        hero.switch_acceleration();
 }
 
 void gameplay::process_project()
@@ -241,6 +243,20 @@ void gameplay::process_enemy()
 
     if (enemy.is_intersect(project))
         project.hide();
+
+    const auto project_pos = project.get_position();
+    const auto project_size = project.get_hitbox();
+    const auto enemy_pos = enemy.get_position();
+    const auto enemy_size = enemy.get_hitbox();
+
+    if (project_pos.x >= enemy_pos.x + enemy_size.first)
+        enemy.set_direction(entity::direction::right);
+    else if (project_pos.x + project_size.first <= enemy_pos.x)
+        enemy.set_direction(entity::direction::left);
+    else if (project_pos.y >= enemy_pos.y + enemy_size.second)
+        enemy.set_direction(entity::direction::down);
+    else if (project_pos.y + project_size.second <= enemy_pos.y)
+        enemy.set_direction(entity::direction::up);
 }
 
 } // namespace game::scene

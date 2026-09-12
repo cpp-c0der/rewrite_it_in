@@ -15,12 +15,13 @@ public:
     uint8_t get_speed() const;
     uint8_t get_energy() const;
     void add_energy(uint8_t value);
+    void switch_acceleration();
     void enable_acceleration();
     void disable_acceleration();
 
 private:
     static inline constexpr auto acceleration = uint8_t(2);
-    static inline constexpr auto energy_limit = uint8_t(30);
+    static inline constexpr auto energy_limit = uint8_t(100);
 
     uint8_t energy = 0;
     bool acceleration_enabled = false;

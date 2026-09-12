@@ -32,6 +32,11 @@ void accelerable_object::add_energy(uint8_t value)
         energy = energy_limit;
 }
 
+void accelerable_object::switch_acceleration()
+{
+    acceleration_enabled = !acceleration_enabled;
+}
+
 void accelerable_object::enable_acceleration()
 {
     acceleration_enabled = true;
