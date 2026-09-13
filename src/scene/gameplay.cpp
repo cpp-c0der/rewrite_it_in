@@ -159,10 +159,10 @@ void gameplay::draw()
     static const auto border = get_border(game::geometry::point{0, char_height});
 
     if (arduboy.everyXFrames(hero_frame_interval))
-        hero.move(border);
+        hero.move(border, enemy);
 
     if (arduboy.everyXFrames(enemy_frame_interval))
-        enemy.move(border);
+        enemy.move(border, hero);
 
     ++frame_count;
 

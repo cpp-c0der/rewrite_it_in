@@ -7,9 +7,9 @@ movable_object::movable_object(game::geometry::point position, size hitbox, uint
 {
 }
 
-void movable_object::move(const geometry::rectangle border)
+void movable_object::move(const geometry::rectangle border, const object& obj)
 {
-    move(border, get_speed());
+    move(border, obj, get_speed());
 }
 
 uint8_t movable_object::get_speed() const
@@ -32,7 +32,7 @@ void movable_object::set_direction(direction dir)
     current_direction = dir;
 }
 
-void movable_object::move(const geometry::rectangle border, const uint8_t current_speed)
+void movable_object::move(const geometry::rectangle border, const object& obj, const uint8_t current_speed)
 {
     switch (current_direction)
     {
@@ -60,6 +60,32 @@ void movable_object::move(const geometry::rectangle border, const uint8_t curren
         else
             position.x = border.right_down.x - hitbox.first;
         break;
+    }
+
+    if (is_intersect(obj))
+    {
+        const auto overlap_left = position.x + hitbox.first - obj.get_position().x;
+        const auto overlap_right = obj.get_position().x + obj.get_hitbox().first;
+        const auto overlap_top = position.y + hitbox.second - obj.get_position().y;
+        const auto overlap_bottom = obj.get_position().y + obj.get_hitbox().second - position.y;
+
+        const auto min_x = overlap_left > overlap_right ? overlap_right : overlap_left;
+        const auto min_y = overlap_bottom > overlap_top ? overlap_top : overlap_bottom;
+
+        if (min_x < min_y)
+        {
+            if (overlap_right < overlap_left)
+                position.x += overlap_right;
+            else
+                position.x -= overlap_left;
+        }
+        else
+        {
+            if (overlap_bottom < overlap_top)
+                position.y += overlap_bottom;
+            else
+                position.y -= overlap_top;
+        }
     }
 }
 

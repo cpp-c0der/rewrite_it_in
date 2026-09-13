@@ -11,7 +11,7 @@ class accelerable_object : public movable_object
 public:
     using movable_object::movable_object;
 
-    void move(const game::geometry::rectangle border);
+    void move(const game::geometry::rectangle border, const object& obj);
     uint8_t get_speed() const;
     uint8_t get_energy() const;
     void add_energy(uint8_t value);

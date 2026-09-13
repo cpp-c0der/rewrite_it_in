@@ -3,9 +3,9 @@
 namespace game::entity
 {
 
-void accelerable_object::move(const game::geometry::rectangle border)
+void accelerable_object::move(const game::geometry::rectangle border, const object& obj)
 {
-    movable_object::move(border, get_speed());
+    movable_object::move(border, obj, get_speed());
 
     if (acceleration_enabled && energy)
         energy -= 1;

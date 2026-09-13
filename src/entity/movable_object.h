@@ -23,14 +23,14 @@ class movable_object : public object
 public:
     movable_object(game::geometry::point position, size hitbox, uint8_t speed);
 
-    void move(const geometry::rectangle border);
+    void move(const geometry::rectangle border, const object& obj);
     uint8_t get_speed() const;
     void set_speed(uint8_t speed);
     direction get_direction() const;
     void set_direction(direction dir);
 
 protected:
-    void move(const geometry::rectangle border, const uint8_t current_speed);
+    void move(const geometry::rectangle border, const object& obj, const uint8_t current_speed);
 
 protected:
     uint8_t speed;
