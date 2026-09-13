@@ -16,48 +16,32 @@ constexpr uint8_t entity_height = 8;
 
 constexpr uint8_t c_icon[] PROGMEM =
     {
-        entity_width, entity_height,
+        entity_width,
+        entity_height,
 
-        0x3C, // ..####..
-        0x42, // .#....#.
-        0x81, // #......#
-        0x81, // #......#
-        0x81, // #......#
-        0x81, // #......#
-        0x81, // #......#
-        0x00, // ........
+        0b00000000,
+        0b00111000,
+        0b01000100,
+        0b01000100,
+        0b01010100,
+        0b00000000,
+        0b00010000,
+        0b00000000
 
-        0x00, // ........
-        0x81, // #......#
-        0x81, // #......#
-        0x81, // #......#
-        0x81, // #......#
-        0x81, // #......#
-        0x42, // .#....#.
-        0x3C, // ..####..
-
-        0x3C,
-        0x42,
-        0x81,
-        0x81,
-        0x81,
-        0x81,
-        0x81,
-        0x00,
-
-        0x00,
-        0x81,
-        0x81,
-        0x81,
-        0x81,
-        0x81,
-        0x42,
-        0x3C //
+        // 0x0, // 0x81,
+        // 0x1C,
+        // 0x22,
+        // 0x22,
+        // 0x2A,
+        // 0x0,
+        // 0x8,
+        // 0x0 // 0x81
 };
 
 constexpr uint8_t rust_icon[] PROGMEM =
     {
-        entity_width, entity_height,
+        entity_width,
+        entity_height,
 
         0xFF, // ########
         0x0F, // ....####
@@ -67,52 +51,48 @@ constexpr uint8_t rust_icon[] PROGMEM =
         0x49, // .#..#..#
         0x8F, // #...####
         0x00, // ........
+};
 
-        0x00, // ........
-        0x8F, // #...####
-        0x49, // .#..#..#
-        0x29, // ..#.#..#
-        0x19, // ...##..#
-        0x09, // ....#..#
-        0x0F, // ....####
-        0xFF, // ########
+constexpr uint8_t go_icon[] PROGMEM =
+    {
+        entity_height, entity_width,
 
-        0xFF,
-        0xF0,
-        0x90,
-        0x98,
-        0x94,
-        0x92,
-        0xF1,
-        0x00,
-
-        0x00,
-        0xF1,
-        0x92,
-        0x94,
-        0x98,
-        0x90,
-        0xF0,
-        0xFF //
+        0b11000011,
+        0b10111101,
+        0b10101101,
+        0b11001111,
+        0b11000011,
+        0b10111101,
+        0b10111101,
+        0b11000011 //
 };
 
 constexpr uint8_t project_icon[] PROGMEM =
     {
         entity_width, entity_height,
-        0x24, // ..#..#..
-        0x24, // ..#..#..
-        0x7E, // .######.
-        0x24, // ..#..#..
-        0x24, // ..#..#..
-        0x7E, // .######.
-        0x24, // ..#..#..
-        0x24  // ..#..#..
+
+        0b00000010,
+        0b11111011,
+        0b10101000,
+        0b10101111,
+        0b10101011,
+        0b10101011,
+        0b11111111,
+        0b00000000 //
 };
 
 constexpr uint8_t adrenaline_icon[] PROGMEM =
     {
         entity_width, entity_height,
-        0x7C, 0xEE, 0xBB, 0xAB, 0xBB, 0xAB, 0xFE, 0x7C //
+
+        0b11111111,
+        0b00000000,
+        0b01010001,
+        0b00111001,
+        0b00010101,
+        0b00000001,
+        0b00000000,
+        0b11111111 //
 };
 
 auto get_border(const auto offset)
@@ -205,6 +185,11 @@ void gameplay::draw()
             auto& state = game::core::get_state();
             state.set_last_score(hero_score);
             state.set_current_scene(game::core::mode::end);
+
+            auto& storage = state.get_storage();
+            if (const auto [is_top, _] = storage.add(hero_score); is_top)
+                storage.save();
+
             reset();
         }
     }
@@ -224,8 +209,8 @@ void gameplay::draw_sprites() const
     const auto adrenaline_pos = adrenaline.get_position();
     const auto enemy_pos = enemy.get_position();
 
-    Sprites::drawOverwrite(hero_pos.x, hero_pos.y, c_icon, static_cast<uint8_t>(hero.get_direction()));
-    Sprites::drawOverwrite(enemy_pos.x, enemy_pos.y, rust_icon, static_cast<uint8_t>(enemy.get_direction()));
+    Sprites::drawOverwrite(hero_pos.x, hero_pos.y, c_icon, 0);
+    Sprites::drawOverwrite(enemy_pos.x, enemy_pos.y, go_icon, 0);
     Sprites::drawOverwrite(project_pos.x, project_pos.y, project_icon, 0);
 
     if (!adrenaline.is_hide())

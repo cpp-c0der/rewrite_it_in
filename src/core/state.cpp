@@ -23,6 +23,11 @@ scene::game_over& state::get_game_over()
     return game_over;
 }
 
+scene::score& state::get_score()
+{
+    return score;
+}
+
 mode state::get_current_scene() const
 {
     return current_scene;
@@ -57,6 +62,11 @@ void state::set_next_level(const uint32_t level_number)
 uint32_t state::get_next_level() const
 {
     return last_level;
+}
+
+top_storage& state::get_storage()
+{
+    return storage;
 }
 
 state& get_state()

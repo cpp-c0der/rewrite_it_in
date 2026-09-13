@@ -38,7 +38,8 @@ void loop()
     }
     case game::core::mode::scores:
     {
-        state.set_current_scene(game::core::mode::menu);
+        auto& score = state.get_score();
+        score.draw();
         break;
     }
     case game::core::mode::level:

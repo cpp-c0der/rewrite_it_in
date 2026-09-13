@@ -34,4 +34,12 @@ uint8_t get_number_count(uint32_t num)
     return count;
 }
 
+bool any_key_pressed()
+{
+    auto& arduboy = game::core::get_arduboy();
+    arduboy.pollButtons();
+
+    return arduboy.justPressed(UP_BUTTON) || arduboy.justPressed(DOWN_BUTTON) || arduboy.justPressed(LEFT_BUTTON) || arduboy.justPressed(RIGHT_BUTTON) || arduboy.justPressed(A_BUTTON) || arduboy.justPressed(B_BUTTON);
+}
+
 } // namespace game::tools

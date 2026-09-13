@@ -20,6 +20,7 @@ private:
 private:
     static inline char text[] = "Game Over";
     static inline char score_text[] = "Scores: ";
+    static inline char top_text[] = "Congrats on top ";
 
     uint32_t score;
 };

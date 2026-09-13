@@ -30,10 +30,7 @@ void level::set_level(const uint32_t level_number)
 
 void level::process_key_press()
 {
-    auto& arduboy = game::core::get_arduboy();
-    arduboy.pollButtons();
-
-    if (arduboy.justPressed(UP_BUTTON) || arduboy.justPressed(DOWN_BUTTON) || arduboy.justPressed(LEFT_BUTTON) || arduboy.justPressed(RIGHT_BUTTON) || arduboy.justPressed(A_BUTTON) || arduboy.justPressed(B_BUTTON))
+    if (game::tools::any_key_pressed())
         game::core::get_state().set_current_scene(game::core::mode::game);
 }
 
