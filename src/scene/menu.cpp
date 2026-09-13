@@ -51,6 +51,9 @@ void menu::draw()
     pos = tools::pair{static_cast<uint8_t>(center.first - char_width * text_size * sizeof(scores) / 2), static_cast<uint8_t>(center.second + char_height + uint8_t(2))};
     print_text(pos, scores, text_size, current_highlight == game::core::mode::scores);
 
+    pos = tools::pair{static_cast<uint8_t>(center.first - char_width * text_size * sizeof(controls) / 2), static_cast<uint8_t>(center.second + char_height * 2 + uint8_t(4))};
+    print_text(pos, controls, text_size, current_highlight == game::core::mode::controls);
+
     process_key_press();
 }
 
@@ -59,12 +62,39 @@ void menu::process_key_press()
     auto& arduboy = game::core::get_arduboy();
     arduboy.pollButtons();
 
-    if (arduboy.justPressed(UP_BUTTON) || arduboy.justPressed(DOWN_BUTTON))
+    if (arduboy.justPressed(UP_BUTTON))
     {
-        if (current_highlight == game::core::mode::level)
-            current_highlight = game::core::mode::scores;
-        else
+        switch (current_highlight)
+        {
+        case game::core::mode::level:
+            current_highlight = game::core::mode::controls;
+            break;
+        case game::core::mode::scores:
             current_highlight = game::core::mode::level;
+            break;
+        case game::core::mode::controls:
+            current_highlight = game::core::mode::scores;
+            break;
+        default:
+            break;
+        }
+    }
+    else if (arduboy.justPressed(DOWN_BUTTON))
+    {
+        switch (current_highlight)
+        {
+        case game::core::mode::level:
+            current_highlight = game::core::mode::scores;
+            break;
+        case game::core::mode::scores:
+            current_highlight = game::core::mode::controls;
+            break;
+        case game::core::mode::controls:
+            current_highlight = game::core::mode::level;
+            break;
+        default:
+            break;
+        }
     }
     else if (arduboy.justPressed(A_BUTTON))
         game::core::get_state().set_current_scene(current_highlight);

@@ -12,6 +12,7 @@ public:
     using movable_object::movable_object;
 
     void move(const game::geometry::rectangle border, const object& obj);
+    void move(const game::geometry::rectangle border, const object& obj, const object& obj2);
     uint8_t get_speed() const;
     uint8_t get_energy() const;
     void add_energy(uint8_t value);
@@ -22,6 +23,8 @@ public:
 private:
     static inline constexpr auto acceleration = uint8_t(2);
     static inline constexpr auto energy_limit = uint8_t(100);
+
+    void process_energy();
 
     uint8_t energy = 0;
     bool acceleration_enabled = false;

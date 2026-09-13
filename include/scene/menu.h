@@ -20,6 +20,7 @@ private:
 private:
     static inline constexpr char start[] = "start";
     static inline constexpr char scores[] = "leaderbord";
+    static inline constexpr char controls[] = "controls";
 
     game::core::mode current_highlight = core::mode::level;
 };

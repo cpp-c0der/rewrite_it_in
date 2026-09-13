@@ -3,6 +3,7 @@
 
 #include "core/mode.h"
 #include "core/top_storage.h"
+#include "scene/controls.h"
 #include "scene/game_over.h"
 #include "scene/gameplay.h"
 #include "scene/level.h"
@@ -20,6 +21,7 @@ public:
     scene::level& get_level();
     scene::game_over& get_game_over();
     scene::score& get_score();
+    scene::controls& get_controls();
 
     mode get_current_scene() const;
     mode get_previous_scene() const;
@@ -39,6 +41,7 @@ private:
     scene::game_over game_over;
     scene::level level;
     scene::score score;
+    scene::controls controls;
 
     mode current_scene = mode::menu;
     mode previous_scene = mode::menu;

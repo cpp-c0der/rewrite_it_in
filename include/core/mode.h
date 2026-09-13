@@ -12,6 +12,7 @@ enum class mode : uint8_t
     game,
     scores,
     level,
+    controls,
     end
 };
 

@@ -24,6 +24,7 @@ public:
     movable_object(game::geometry::point position, size hitbox, uint8_t speed);
 
     void move(const geometry::rectangle border, const object& obj);
+    void move(const geometry::rectangle border, const object& obj, const object& obj2);
     uint8_t get_speed() const;
     void set_speed(uint8_t speed);
     direction get_direction() const;
@@ -31,6 +32,11 @@ public:
 
 protected:
     void move(const geometry::rectangle border, const object& obj, const uint8_t current_speed);
+    void move(const geometry::rectangle border, const object& obj, const object& obj2, const uint8_t current_speed);
+
+private:
+    void process_overlap(const object& obj);
+    void process_border(const geometry::rectangle border, const uint8_t current_speed);
 
 protected:
     uint8_t speed;

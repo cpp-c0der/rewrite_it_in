@@ -67,6 +67,33 @@ constexpr uint8_t go_icon[] PROGMEM =
         0b11000011 //
 };
 
+constexpr uint8_t python_icon[] PROGMEM =
+    {
+        entity_width, entity_height,
+
+        0b11000011,
+        0b11000011,
+        0b00000000,
+        0b11100010,
+        0b10100000,
+        0b11111111,
+        0b00111100,
+        0b00111100 //
+};
+
+constexpr uint8_t python_icon2[] PROGMEM =
+    {
+        entity_width, entity_height,
+        0b11000011,
+        0b11000011,
+        0b00000010,
+        0b11100000,
+        0b11100000,
+        0b10111111,
+        0b00111100,
+        0b00111100 //
+};
+
 constexpr uint8_t project_icon[] PROGMEM =
     {
         entity_width, entity_height,
@@ -135,9 +162,11 @@ void update_position(Object& obj, Objects&... objects)
 gameplay::gameplay() : hero(get_center_position(), {entity_width, entity_height}, hero_default_speed),
                        project(get_random_position(), {entity_width, entity_height}),
                        adrenaline({}, {entity_width, entity_height}),
-                       enemy(get_random_position(), {entity_width, entity_height}, enemy_default_speed)
+                       enemy(get_random_position(), {entity_width, entity_height}, enemy_default_speed),
+                       enemy2({}, {entity_width, entity_height}, enemy_default_speed)
 {
     adrenaline.hide();
+    enemy2.hide();
 
     while (hero.is_intersect(project))
         project.set_position(get_random_position());
@@ -159,10 +188,13 @@ void gameplay::draw()
     static const auto border = get_border(game::geometry::point{0, char_height});
 
     if (arduboy.everyXFrames(hero_frame_interval))
-        hero.move(border, enemy);
+        hero.move(border, enemy, enemy2);
 
     if (arduboy.everyXFrames(enemy_frame_interval))
+    {
         enemy.move(border, hero);
+        enemy2.move(border, hero);
+    }
 
     ++frame_count;
 
@@ -208,10 +240,14 @@ void gameplay::draw_sprites() const
     const auto project_pos = project.get_position();
     const auto adrenaline_pos = adrenaline.get_position();
     const auto enemy_pos = enemy.get_position();
+    const auto enemy2_pos = enemy2.get_position();
 
     Sprites::drawOverwrite(hero_pos.x, hero_pos.y, c_icon, 0);
     Sprites::drawOverwrite(enemy_pos.x, enemy_pos.y, rust_icon, 0);
     Sprites::drawOverwrite(project_pos.x, project_pos.y, project_icon, 0);
+
+    if (!enemy2.is_hide())
+        Sprites::drawOverwrite(enemy2_pos.x, enemy2_pos.y, python_icon2, 0);
 
     if (!adrenaline.is_hide())
         Sprites::drawOverwrite(adrenaline_pos.x, adrenaline_pos.y, adrenaline_icon, 0);
@@ -264,7 +300,7 @@ void gameplay::process_project()
     if (project.is_hide())
     {
         project.show();
-        update_position(project, hero, adrenaline, enemy);
+        update_position(project, hero, adrenaline, enemy, enemy2);
     }
 }
 
@@ -282,31 +318,61 @@ void gameplay::process_adrenaline()
     if (adrenaline.is_hide() && adrenaline_propability > random(100))
     {
         adrenaline.show();
-        update_position(adrenaline, hero, project, enemy);
+        update_position(adrenaline, hero, project, enemy, enemy2);
     }
 }
 
 void gameplay::process_enemy()
 {
-    if (enemy.is_intersect(adrenaline))
+    if (enemy.is_intersect(adrenaline) || enemy2.is_intersect(adrenaline))
         adrenaline.hide();
 
-    if (enemy.is_intersect(project))
+    if (enemy.is_intersect(project) || enemy2.is_intersect(project))
         project.hide();
 
-    const auto project_pos = project.get_position();
-    const auto project_size = project.get_hitbox();
-    const auto enemy_pos = enemy.get_position();
-    const auto enemy_size = enemy.get_hitbox();
+    const auto ai_logic = [&](auto& enemy)
+    {
+        const auto project_pos = project.get_position();
+        const auto project_size = project.get_hitbox();
+        const auto enemy_pos = enemy.get_position();
+        const auto enemy_size = enemy.get_hitbox();
 
-    if (project_pos.x >= enemy_pos.x + enemy_size.first)
-        enemy.set_direction(entity::direction::right);
-    else if (project_pos.x + project_size.first <= enemy_pos.x)
-        enemy.set_direction(entity::direction::left);
-    else if (project_pos.y >= enemy_pos.y + enemy_size.second)
-        enemy.set_direction(entity::direction::down);
-    else if (project_pos.y + project_size.second <= enemy_pos.y)
-        enemy.set_direction(entity::direction::up);
+        if (project_pos.x >= enemy_pos.x + enemy_size.first)
+            enemy.set_direction(entity::direction::right);
+        else if (project_pos.x + project_size.first <= enemy_pos.x)
+            enemy.set_direction(entity::direction::left);
+        else if (project_pos.y >= enemy_pos.y + enemy_size.second)
+            enemy.set_direction(entity::direction::down);
+        else if (project_pos.y + project_size.second <= enemy_pos.y)
+            enemy.set_direction(entity::direction::up);
+    };
+
+    const auto ai_logic2 = [&](auto& enemy)
+    {
+        const auto adrenaline_pos = adrenaline.get_position();
+        const auto adrenaline_size = adrenaline.get_hitbox();
+        const auto enemy_pos = enemy.get_position();
+        const auto enemy_size = enemy.get_hitbox();
+
+        if (adrenaline_pos.x >= enemy_pos.x + enemy_size.first)
+            enemy.set_direction(entity::direction::right);
+        else if (adrenaline_pos.x + adrenaline_size.first <= enemy_pos.x)
+            enemy.set_direction(entity::direction::left);
+        else if (adrenaline_pos.y >= enemy_pos.y + enemy_size.second)
+            enemy.set_direction(entity::direction::down);
+        else if (adrenaline_pos.y + adrenaline_size.second <= enemy_pos.y)
+            enemy.set_direction(entity::direction::up);
+    };
+
+    ai_logic(enemy);
+
+    if (!enemy2.is_hide())
+    {
+        if (!adrenaline.is_hide())
+            ai_logic2(enemy2);
+        else
+            ai_logic(enemy2);
+    }
 }
 
 void gameplay::to_next_level()
@@ -317,7 +383,11 @@ void gameplay::to_next_level()
 
 void gameplay::reset_objects()
 {
-    enemy.set_speed(enemy_default_speed + level_number);
+    enemy.set_speed(enemy_default_speed + (level_number > 4 ? 4 : level_number));
+    enemy2.set_speed(enemy_default_speed + (level_number > 4 ? 4 : level_number));
+
+    if (level_number > 2)
+        enemy2.show();
 
     project_limit = project_limit_base + project_limit_factor * level_number;
     project_remaining = project_limit;
@@ -330,6 +400,7 @@ void gameplay::reset_objects()
 
     update_position(project, hero);
     update_position(enemy, hero, project);
+    update_position(enemy2, enemy, hero, project);
 }
 
 } // namespace game::scene

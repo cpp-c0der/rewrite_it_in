@@ -7,6 +7,11 @@ movable_object::movable_object(game::geometry::point position, size hitbox, uint
 {
 }
 
+void movable_object::move(const geometry::rectangle border, const object& obj, const object& obj2)
+{
+    move(border, obj, obj2, get_speed());
+}
+
 void movable_object::move(const geometry::rectangle border, const object& obj)
 {
     move(border, obj, get_speed());
@@ -32,7 +37,20 @@ void movable_object::set_direction(direction dir)
     current_direction = dir;
 }
 
+void movable_object::move(const geometry::rectangle border, const object& obj, const object& obj2, const uint8_t current_speed)
+{
+    process_border(border, current_speed);
+    process_overlap(obj);
+    process_overlap(obj2);
+}
+
 void movable_object::move(const geometry::rectangle border, const object& obj, const uint8_t current_speed)
+{
+    process_border(border, current_speed);
+    process_overlap(obj);
+}
+
+void movable_object::process_border(const geometry::rectangle border, const uint8_t current_speed)
 {
     switch (current_direction)
     {
@@ -61,7 +79,10 @@ void movable_object::move(const geometry::rectangle border, const object& obj, c
             position.x = border.right_down.x - hitbox.first;
         break;
     }
+}
 
+void movable_object::process_overlap(const object& obj)
+{
     if (is_intersect(obj))
     {
         const auto overlap_left = position.x + hitbox.first - obj.get_position().x;

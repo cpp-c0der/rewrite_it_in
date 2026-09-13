@@ -57,6 +57,12 @@ void loop()
         game_over.draw();
         break;
     }
+    case game::core::mode::controls:
+    {
+        auto& controls = state.get_controls();
+        controls.draw();
+        break;
+    }
     }
 
     arduboy.display();

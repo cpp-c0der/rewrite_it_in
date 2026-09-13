@@ -34,9 +34,9 @@ private:
     static inline constexpr auto enemy_frame_interval = uint8_t(16);
     static inline constexpr auto scores_for_project = uint8_t(10);
     static inline constexpr auto adrenaline_propability = uint8_t(1);
-    static inline constexpr auto project_limit_factor = 5;
-    static inline constexpr auto time_limit_factor = 20;
+    static inline constexpr auto project_limit_factor = 2;
     static inline constexpr auto project_limit_base = 10;
+    static inline constexpr auto time_limit_factor = 20;
     static inline constexpr auto time_limit_base = 60;
 
     uint32_t hero_score = 0;
@@ -52,6 +52,7 @@ private:
 
     entity::accelerable_object hero;
     entity::movable_object enemy;
+    entity::movable_object enemy2;
     entity::object project;
     entity::object adrenaline;
 };

@@ -28,6 +28,11 @@ scene::score& state::get_score()
     return score;
 }
 
+scene::controls& state::get_controls()
+{
+    return controls;
+}
+
 mode state::get_current_scene() const
 {
     return current_scene;
