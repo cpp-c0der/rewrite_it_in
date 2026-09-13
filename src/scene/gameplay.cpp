@@ -385,6 +385,7 @@ void gameplay::reset_objects()
 {
     enemy.set_speed(enemy_default_speed + (level_number > 4 ? 4 : level_number));
     enemy2.set_speed(enemy_default_speed + (level_number > 4 ? 4 : level_number));
+    enemy2.hide();
 
     if (level_number > 2)
         enemy2.show();
@@ -396,11 +397,13 @@ void gameplay::reset_objects()
     frame_count = 0;
 
     adrenaline.hide();
-    hero.set_position(get_center_position());
+    hero = entity::accelerable_object(get_center_position(), {entity_width, entity_height}, hero_default_speed);
 
     update_position(project, hero);
     update_position(enemy, hero, project);
-    update_position(enemy2, enemy, hero, project);
+
+    if (!enemy2.is_hide())
+        update_position(enemy2, enemy, hero, project);
 }
 
 } // namespace game::scene
