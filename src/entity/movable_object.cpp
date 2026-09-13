@@ -65,7 +65,7 @@ void movable_object::move(const geometry::rectangle border, const object& obj, c
     if (is_intersect(obj))
     {
         const auto overlap_left = position.x + hitbox.first - obj.get_position().x;
-        const auto overlap_right = obj.get_position().x + obj.get_hitbox().first;
+        const auto overlap_right = obj.get_position().x + obj.get_hitbox().first - position.x;
         const auto overlap_top = position.y + hitbox.second - obj.get_position().y;
         const auto overlap_bottom = obj.get_position().y + obj.get_hitbox().second - position.y;
 

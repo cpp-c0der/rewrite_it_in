@@ -43,14 +43,14 @@ constexpr uint8_t rust_icon[] PROGMEM =
         entity_width,
         entity_height,
 
-        0xFF, // ########
-        0x0F, // ....####
-        0x09, // ....#..#
-        0x19, // ...##..#
-        0x29, // ..#.#..#
-        0x49, // .#..#..#
-        0x8F, // #...####
-        0x00, // ........
+        0b00011000,
+        0b01111110,
+        0b01000010,
+        0b11101011,
+        0b11101011,
+        0b01010110,
+        0b01111110,
+        0b00011000 //
 };
 
 constexpr uint8_t go_icon[] PROGMEM =
@@ -210,7 +210,7 @@ void gameplay::draw_sprites() const
     const auto enemy_pos = enemy.get_position();
 
     Sprites::drawOverwrite(hero_pos.x, hero_pos.y, c_icon, 0);
-    Sprites::drawOverwrite(enemy_pos.x, enemy_pos.y, go_icon, 0);
+    Sprites::drawOverwrite(enemy_pos.x, enemy_pos.y, rust_icon, 0);
     Sprites::drawOverwrite(project_pos.x, project_pos.y, project_icon, 0);
 
     if (!adrenaline.is_hide())
